@@ -1,4 +1,6 @@
 
+// 2. Add Friends
+// 3. Make the feed refresh less jumpy
 
 var app = {};
 
@@ -6,29 +8,28 @@ $( document ).ready(function() {
     app.init();
     $(".btn").click(function(event){
       event.preventDefault();
-      app.handleSubmit($('.msg'), $('.usr'));
+      app.handleSubmit($('.msg'), $('.usr'), $('.rm'));
+      $('.msg').val('');
+      $('.usr').val('');
+      $('.rm').val('');
+    });
+    $('#').click(function() {
+
     }); 
-    // $(this).on('click', '.username', this.addFriend());
 });
 
 app.init = function () {
   this.server = 'https://api.parse.com/1/classes/chatterbox';
   this.rooms = [];
+  this.currentRooms = {};
   setInterval(function() {
     app.clearMessages();
     app.fetch(); 
-    // console.log(app.rooms);
   }, 4000);
-  // $('.msg').on('click', 'button', function () {
-  //   console.log("hello");
-  //   //this.handleSubmit($(this).text()); 
-  // });
-  // $(this).on('click', '.submit', this.handleSubmit());
 };
 
 app.send = function(message) {
   $.ajax({
-    // This is the url you should use to communicate with the parse API server.
     url: 'https://api.parse.com/1/classes/chatterbox',
     type: 'POST',
     data: JSON.stringify(message),
@@ -37,7 +38,6 @@ app.send = function(message) {
       console.log('chatterbox: Message sent');
     },
     error: function (data) {
-      // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
       console.error('chatterbox: Failed to send message');
     }
   });
@@ -45,26 +45,19 @@ app.send = function(message) {
 
 app.fetch = function() {
   $.ajax({
-    // This is the url you should use to communicate with the parse API server.
     url: 'https://api.parse.com/1/classes/chatterbox',
     type: 'GET',
     data: 'JSON',
     contentType: 'application/json',
     success: function (data) {
-      var arr = data.results;
-      console.log(data.results);
-      for (var i = 0; i < arr.length; i++) {
-        // if (app.rooms.indexOf(data.results[i].roomname) < 0) {
-          app.rooms.push(data.results[i].roomname);
-        // }
-        // console.log(arr[i].text);
-        app.addMessage(arr[i]);
+      // console.log(data);
+      for (var i = 0; i < data.results.length; i++) {
+        app.rooms.push(data.results[i]["roomname"]);
+        app.addRoom(app.rooms);
+        app.addMessage(data.results[i]);
       }
-      //this.addMessage(data);
-      //console.log('chatterbox: Message retrieved');
     },
     error: function (data) {
-      // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
       console.error('chatterbox: Failed to retrieve message');
     }
   });
@@ -80,27 +73,39 @@ app.escapeHTML = function (unsafe_str) {
 };
 
 app.addMessage = function(message) {
-  var user = this.escapeHTML(message.username);
-  var txt = this.escapeHTML(message.text);
-  $('#chats').append('<div class=chat><p class=username>' + user + ":</p> <p>" + txt + '</p></div>');
+  if (message.username !== undefined && message.text !== undefined) {
+    var user = this.escapeHTML(message.username);
+    var txt = this.escapeHTML(message.text);
+    $('#chats').append('<div class=chat><p class=username' + user + '>' + user + ":</p> <p>" + txt + '</p></div>');
+  }
 };
 
 app.clearMessages = function(){
   $('#chats').empty();
 };
-app.addRoom = function (message) {
-  $('.room').append('<option>' + message.roomname + '</option>'); //may need classname
+app.addRoom = function (roomsArray) {
+  for (var i = 0; i < roomsArray.length; i++) {
+    if (roomsArray[i] !== undefined && roomsArray[i] !== "" && !app.currentRooms[roomsArray[i]]) {
+      app.currentRooms[roomsArray[i]] = roomsArray[i];
+      $('.room').append('<option value=' + roomsArray[i] + '>' + roomsArray[i] + '</option>'); //may need classname
+    }
+  }
 };
 app.addFriend = function () {
   //$('.username').click();
 };
 
-app.handleSubmit = function (msg, usr) {
+app.handleSubmit = function (msg, usr, rm) {
   console.log(message);
   var message = {};
   message.username = usr.val();
   message.text = msg.val();
-  message.roomname = "room1";
+  if (rm.val() === undefined || rm.val() === "") {
+    message.roomname = $( "select.room option:selected").val();
+    console.log(message.roomname);
+  } else {
+    message.roomname = rm.val();
+  }
   app.send(message);
 };
 
