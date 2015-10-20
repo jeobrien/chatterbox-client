@@ -4,9 +4,14 @@
 var app = {};
 
 app.init = function () {
-  app.server = 'https://api.parse.com/1/classes/chatterbox';
+  this.server = 'https://api.parse.com/1/classes/chatterbox';
   $(this).on('click', '.username', this.addFriend());
   $(this).on('click', '.submit', this.handleSubmit());
+  // this.data = this.fetch();
+  // console.log(data);
+  // for (var i = 0; i < data.length; i++) {
+  //   this.addMessage(data[i]);
+  // }
 };
 
 app.send = function(message) {
@@ -34,7 +39,15 @@ app.fetch = function() {
     data: 'JSON',
     contentType: 'application/json',
     success: function (data) {
-      console.log('chatterbox: Message retrieved');
+      // console.log(data);
+      var arr = data.results;
+      // console.log(data);
+      for (var i = 0; i < arr.length; i++) {
+        // console.log(arr[i].text);
+        app.addMessage(arr[i]);
+      }
+      //this.addMessage(data);
+      //console.log('chatterbox: Message retrieved');
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -43,15 +56,27 @@ app.fetch = function() {
   });
 };
 
+app.escapeHTML = function (unsafe_str) {
+  return unsafe_str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\"/g, '&quot;')
+    .replace(/\'/g, '&#39;'); // '&apos;' is not valid HTML 4
+};
+
 app.addMessage = function(message) {
-  $('#chats').append('<div class="' + message.username + '">' + message.text + '</div>');
+  var user = this.escapeHTML(message.username);
+  var txt = this.escapeHTML(message.text);
+  console.log(user);
+  $('#chats').append('<div class=".username"><p>' + user + ":</p> <p>" + txt + '</p></div>');
 };
 
 app.clearMessages = function(){
   $('#chats').empty();
 };
 app.addRoom = function (message) {
-  $('#roomSelect').append('<div>' + message.roomname + '</div>');
+  $('.room').append('<option>' + message.roomname + '</option>'); //may need classname
 };
 app.addFriend = function () {
   //$('.username').click();
