@@ -1,6 +1,55 @@
 
-// 2. Add Friends
-// 3. Make the feed refresh less jumpy
+// var Message = Backbone.Model.extend({
+//   initialize: function(message) {
+//     url: 'https://api.parse.com/1/classes/chatterbox';
+//     defaults: {
+//       username: '';
+//       text: '';
+//     }
+//   }
+// });
+
+// var Messages = Backbone.Collection.extend({
+//   model: Message
+// });
+
+// var MessageView = Backbone.View.extend({
+//   el: '.chat',
+//   initialize: function() {
+//     this.model.on('change:text', this.render, this);
+//   };
+
+//   render: function() {
+//     var html = [
+//       '<p class=username>',
+//         this.model.get('username') + ': ',
+//       '</p>'
+//       '<p>'
+//         this.model.get('text'),
+//       '</p>'
+//     ].join('');
+
+//     return this.$el.html(html);
+//   }
+// });
+// var MessagesView = Backbone.View.extend({
+//   el: '#chats',
+//   initialize: function () {
+//     this.collection.on('change:text', this.render, this);
+//     setInterval(function() {this.model.fetch()}, 3000);
+//   }, 
+
+//   render: function() {
+//     var html = [
+//       '<div class=chat>',
+//         // output from MessageView
+//       '</div>'
+//     ].join('');
+//     return this.$el.html(html);
+//   }
+  
+// });
+
 
 var app = {};
 
